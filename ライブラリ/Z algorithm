@@ -1,0 +1,19 @@
+// https://hcpc-hokudai.github.io/archive/string_algorithms_001.pdf
+
+vector<int> Z_algorithm(string S){
+    int c=0,n=S.size();
+    vector<int> Z(n,0);
+    for(int i=1; i<n; i++){
+        int l = i-c;
+        if(i+Z[l] < c+Z[c]){
+            Z[i] = Z[l];
+        }else{
+            int j = max(0, c+Z[c]-i);
+            while(i+j<n and S[j]==S[i+j]) j++;
+            Z[i] = j;
+            c = i;
+        }
+    }
+    Z[0] = n;
+    return Z;
+}

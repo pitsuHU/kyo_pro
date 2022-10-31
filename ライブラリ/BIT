@@ -1,0 +1,41 @@
+// Binary indexed Tree(BIT)
+template <typename T>
+struct BIT{
+    private:
+    vector<T> array;
+    const int n;
+
+    public:
+    // 初期化
+    BIT(int _n) : array(_n+1,0),n(_n) {}
+
+    // 1番目からi番目までの累積和を求める
+    T sum(int i){
+        T s = 0;
+        while(i > 0){
+            s += array[i];
+            // LSB減算
+            i -= i & -i;
+        }
+        return s;
+    }
+    
+    // [i,j]の要素の総和
+    T sum(int i,int j){
+        // 1番目からi-1番目までの総和
+        T ret_i = sum(i-1);
+        // 1番目からj番目までの総和
+        T ret_j = sum(j);
+        // i番目からj番目までの総和
+        return ret_j - ret_i;
+    }
+
+    // i番目に要素xを追加
+    void add(int i,T x){
+        while(i <= n){
+            array[i] += x;
+            // LSB加算
+            i += i & -i;
+        }
+    }
+};

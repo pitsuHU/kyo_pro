@@ -1,0 +1,38 @@
+
+struct UnionFind {
+    vector<int> par, w;
+
+    UnionFind(int n) : par(n, -1), w(n, 0) { }
+    void init(int n) { par.assign(n, -1); w.assign(n, 0); }
+
+    int root(int x) {
+        if (par[x] < 0) return x;
+        else return par[x] = root(par[x]);
+    }
+
+    bool issame(int x, int y) {
+        return root(x) == root(y);
+    }
+
+    bool merge(int x, int y) {
+        x = root(x); y = root(y);
+        if (x == y) {
+            ++w[x];
+            return false;
+        }
+        if (par[x] > par[y]) swap(x, y); // merge technique
+        par[x] += par[y];
+        par[y] = x;
+        w[x] += w[y];
+        ++w[x];
+        return true;
+    }
+
+    int size(int x) {
+        return -par[root(x)];
+    }
+
+    int wei(int x) {
+        return w[root(x)];
+    }
+};

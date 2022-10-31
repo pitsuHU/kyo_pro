@@ -1,0 +1,54 @@
+struct LCA {
+    vector<vector<int>> parent; // parent[k][u] := u の 2^k 先の親
+    vector<int> dist; // root からの距離
+    LCA(const vector<vector<int>> &G,int root = 0){ init(G,root); }
+
+    // 初期化
+    void init(const vector<vector<int>> &G,int root = 0){
+        int V = G.size();
+        int K = 1;
+        while((1 << K) < V) K++;
+        parent.assign(K, vector<int>(V, -1));
+        dist.assign(V,-1);
+        dfs(G,root,-1,0);
+        for(int k=0; k<K-1; k++){
+            for(int v=0; v<V; v++){
+                if(parent[k][v] < 0){
+                    parent[k+1][v] = -1;
+                }else{
+                    parent[k+1][v] = parent[k][parent[k][v]];
+                }
+            }
+        }
+    }
+
+    // 根からの距離と一つ先の頂点を求める
+    void dfs(const vector<vector<int>> &G, int v, int p,int d){
+        // 一つ先の頂点
+        parent[0][v] = p;
+        dist[v] = d;
+        for(auto nv: G[v]){
+            if(nv != p) dfs(G,nv,v,d+1);
+        }
+    }
+
+    int query(int u,int v){
+        if(dist[u] < dist[v]) swap(u,v);
+        int K = parent.size();
+        // LCAまでの距離を同じにする
+        for(int k=0; k<K; k++){
+            if((dist[u]-dist[v]) >> k & 1){
+                u = parent[k][u];
+            }
+        }
+        // 二分探索で LCA を求める
+        if(u == v) return u;
+        for(int k=K-1; k>=0; k--){
+            if(parent[k][u] != parent[k][v]){
+                u = parent[k][u];
+                v = parent[k][v];
+            }
+        }
+        return parent[0][u];
+    }
+};

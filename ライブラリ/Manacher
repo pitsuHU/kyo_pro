@@ -1,0 +1,18 @@
+// https://hcpc-hokudai.github.io/archive/string_algorithms_001.pdf
+
+vector<int> Manacher(string S){
+    int c=0, n=S.size();
+    vector<int> R(n,1);
+    for(int i=0; i<n; i++){
+        int l = c - (i - c);
+        if(i+R[l] < c+R[c]){
+            R[i] = R[l];
+        }else{
+            int j = c + R[c] - i;
+            while(i-j>=0 and i+j<n and S[i-j]==S[i+j]) j++;
+            R[i] = j;
+            c = i;
+        }
+    }
+    return R;
+}
