@@ -44,23 +44,55 @@ ll gcd(ll a,ll b){if(b==0){return a;}else{return gcd(b,a%b);}};
 int main(){
     ll N;
     cin >> N;
-    vector<bitset<3010>> dp(N);
+    vector<ll> pre(N),mid(N);
+    for(int i=0; i<N; i++) cin >> pre[i],pre[i]--;
+    for(int i=0; i<N; i++) cin >> mid[i],mid[i]--;
+    if(pre[0] != 0){
+        cout << -1 << endl;
+        return 0;
+    }
+    vector<ll> mid_pos(N);
+    vector<ll> pre_pos(N);
     for(int i=0; i<N; i++){
-        for(int j=0; j<N; j++){
-            char x;
-            cin >> x;
-            if(i < j && x == '1'){
-                dp[i][j] = 1;
+        pre_pos[pre[i]] = i;
+        mid_pos[mid[i]] = i;
+    }
+    queue<pair<ll,P>> que;
+    vector<ll> L(N,-1),R(N,-1);
+    que.emplace(0,P(0,N));
+    vector<bool> used(N);
+    while(que.size()){
+        ll v = que.front().first;
+        auto [l,r] = que.front().second;
+        // cout << v << " " << l << " " << r << endl;
+        que.pop();
+        if(used[v]){
+            cout << -1 << endl;
+            return 0;
+        }
+        used[v] = true;
+        ll l_size = mid_pos[v] - l;
+        ll r_size = r - mid_pos[v] - 1;
+        if(l_size > 0){
+            if(pre_pos[v]+1 >= N){
+                cout << -1 << endl;
+                return 0;
             }
+            ll nv = pre[pre_pos[v]+1];
+            L[v] = nv;
+            que.emplace(nv,P(l,mid_pos[v]));
+        }
+        if(r_size > 0){
+            if(pre_pos[v]+l_size+1 >= N){
+                cout << -1 << endl;
+                return 0;
+            }
+            ll nv = pre[pre_pos[v]+l_size+1];
+            R[v] = nv;
+            que.emplace(nv,P(mid_pos[v]+1,r));
         }
     }
-    ll ans = 0;
     for(int i=0; i<N; i++){
-        for(int j=i+1; j<N; j++){
-            if(!dp[i][j]) continue;
-            bitset<3010> res = (dp[i]&dp[j]);
-            ans += res.count();
-        }
+        cout << L[i]+1 << " " << R[i]+1 << "\n";
     }
-    cout << ans << endl;
 }
